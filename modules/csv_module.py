@@ -1,6 +1,6 @@
 import csv
 
-class csv_module:
+class csv_manager:
     def __init__(self):
         file_path = "assets/item_menu.csv"
     
