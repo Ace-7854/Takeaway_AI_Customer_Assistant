@@ -4,6 +4,38 @@ from flask import jsonify
 
 app = Flask(__name__)
 
+@app.route('/')
+def home():
+
+    return redirect(url_for('login'))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        
+        session['user'] = {
+            'email':email,
+            'pwrd' : password
+        }
+
+        if email == "email@test.com" and password == "pass123":
+            return render_template(url_for())
+
+@app.route('/dashboard')
+def dashboard():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    
+    return render_template(
+        'dashboard.html',
+        user=session['user']
+        )
+
+
+
 @app.route('/webhook', methods=['POST'])
 def receive_webhook():
     # Get JSON data sent by Bland AI
