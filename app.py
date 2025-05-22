@@ -3,6 +3,8 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from flask import jsonify
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # Needed for sessions
+
 
 @app.route('/')
 def home():
@@ -20,7 +22,7 @@ def login():
         }
 
         if email == "email@test.com" and password == "pass123":
-            return render_template(url_for('dashboard'))
+            return redirect(url_for('dashboard'))
         
     return render_template('login.html')
 
@@ -28,7 +30,6 @@ def login():
 def dashboard():
     if 'user' not in session:
         return redirect(url_for('login'))
-    
     
     return render_template(
         'dashboard.html',
