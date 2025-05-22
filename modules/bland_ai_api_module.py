@@ -29,3 +29,6 @@ class bland_api:
             "webhook": "https://webhook.site/72186de7-061a-4087-aae2-1b0f688589d5",
             "pathway_id": self.pathway_id
         }
+
+    def retrieving_webhook_data():
+        pass
