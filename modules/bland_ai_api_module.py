@@ -16,7 +16,11 @@ class bland_api:
             "task": f"",
             "voice": "Karl",
             "request_data": {
-                'menu': menu
+                'menu': menu,
+                'del_time_limit': "",
+                'col_time_limit': "",
+                'users_order': "",
+                'cost':""
             },
             "record": True,
             "reduce_latency": True,
