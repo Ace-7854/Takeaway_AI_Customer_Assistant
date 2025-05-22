@@ -6,7 +6,6 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-
     return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -21,7 +20,9 @@ def login():
         }
 
         if email == "email@test.com" and password == "pass123":
-            return render_template(url_for())
+            return render_template(url_for('dashboard'))
+        
+    return render_template('login.html')
 
 @app.route('/dashboard')
 def dashboard():
