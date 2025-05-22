@@ -36,7 +36,10 @@ def dashboard():
         user=session['user']
         )
 
-
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('login'))
 
 @app.route('/webhook', methods=['POST'])
 def receive_webhook():
