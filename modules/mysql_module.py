@@ -1,6 +1,6 @@
 import mysql.connector
 from mysql.connector import Error
-from env_module import get_sql_host, get_sql_database, get_sql_password, get_sql_user
+from modules.env_module import get_sql_host, get_sql_database, get_sql_password, get_sql_user
 
 class MySQLManager:
     def __init__(self):
@@ -10,7 +10,106 @@ class MySQLManager:
             'password': get_sql_password(),
             'database': get_sql_database()
         }
+
         self.connection = None
+
+    # region database creations
+
+    def __get_tables_made(self):
+        return self.__fetch_query("SHOW TABLES;")
+
+    def define_required_tables(self):
+        current_tbls = self.__get_tables_made()
+
+        if current_tbls:
+            pass #logic is flawed, needs re-doing
+            # for tbl in current_tbls:
+                # if tbl.lower() == "customer_tbl":
+                    # self.__define_customer_tbl
+                # if tbl.lower() == "menu_item_tbl":
+                    # self.__define_menu_items_tbl()
+                # if tbl.lower() == "order_tbl":
+                    # self.__define_order_tbl()
+                # if tbl.lower() == "customer_order_lnk":
+                    # self.__define_lnk_order_customer()
+                # if tbl.lower() == "user_tbl":
+                    # self.__define_user_tbl()
+                # if tbl.lower() == "logs_tbl":
+                    # self.__define_logs()
+        else:
+            self.__define_customer_tbl()
+            self.__define_menu_items_tbl()
+            self.__define_order_tbl()
+            self.__define_lnk_order_customer()
+            self.__define_logs()
+
+    def __define_customer_tbl(self):
+        query = """CREATE TABLE customer_tbl (
+        customer_id INT AUTO_INCREMENT UNIQUE PRIMARY KEY,
+        customer_name VARCHAR(50),
+        address VARCHAR(50),
+        phone_num VARCHAR(50)
+        )"""
+
+        self.__execute_query(query)
+
+    def __define_order_tbl(self):
+        query = """CREATE TABLE order_tbl (
+        order_id INT AUTO_INCREMENT UNIQUE PRIMARY KEY,
+        items VARCHAR(50),
+        date DATE 
+        )"""
+
+        self.__execute_query(query)
+
+    def __define_menu_items_tbl(self):
+        query = """CREATE TABLE menu_item_tbl (
+        itemid INT AUTO_INCREMENT UNIQUE PRIMARY KEY,
+        item_name VARCHAR(50),
+        price VARCHAR(50)
+        )""" 
+
+        self.__execute_query(query)
+
+    def __define_lnk_order_customer(self):
+        query = """CREATE TABLE customer_order_lnk (
+        customer_id INT,
+        order_id INT,
+        PRIMARY KEY(customer_id, order_id),
+        FOREIGN KEY (customer_id) REFERENCES customer_tbl(customer_id) ON DELETE CASCADE,
+        FOREIGN KEY (order_id) REFERENCES order_tbl(order_id) ON DELETE CASCADE
+        )"""
+
+        self.__execute_query(query)
+
+    def __define_user_tbl(self):
+        query = """CREATE TABLE user_tbl (
+        user_id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(50),
+        email VARCHAR(50),
+        password_hash VARCHAR(50),
+        role ENUM('user', 'admin') DEFAULT 'user',
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )"""
+
+        self.__fetch_query(query)
+
+    def __define_logs(self):
+        query = """CREATE TABLE logs_tbl (
+        log_id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT,
+        action VARCHAR(255) NOT NULL,
+        details TEXT,
+        ip_address VARCHAR(45),
+        user_agent VARCHAR(255),
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES user_tbl(user_id) ON DELETE SET NULL
+        );"""
+
+        self.__execute_query(query)
+
+    # endregion
 
     def connect(self):
         try:
@@ -25,7 +124,7 @@ class MySQLManager:
             self.connection.close()
             print("🔌 MySQL connection closed")
 
-    def execute_query(self, query, params=None):
+    def __execute_query(self, query, params=None):
         cursor = None
         try:
             cursor = self.connection.cursor()
@@ -33,12 +132,13 @@ class MySQLManager:
             self.connection.commit()
             print("✅ Query executed successfully")
         except Error as e:
+            self.connection.rollback()
             print(f"❌ Error executing query: {e}")
         finally:
             if cursor:
                 cursor.close()
 
-    def fetch_query(self, query, params=None):
+    def __fetch_query(self, query, params=None):
         cursor = None
         try:
             cursor = self.connection.cursor(dictionary=True)
