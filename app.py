@@ -17,7 +17,7 @@ def login():
         password = request.form['password']
         
         session['user'] = {
-            'email':email,
+            'email': email,
             'pwrd' : password
         }
 
