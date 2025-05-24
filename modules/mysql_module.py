@@ -22,25 +22,45 @@ class MySQLManager:
         current_tbls = self.__get_tables_made()
 
         if current_tbls:
-            pass #logic is flawed, needs re-doing
-            # for tbl in current_tbls:
-                # if tbl.lower() == "customer_tbl":
-                    # self.__define_customer_tbl
-                # if tbl.lower() == "menu_item_tbl":
-                    # self.__define_menu_items_tbl()
-                # if tbl.lower() == "order_tbl":
-                    # self.__define_order_tbl()
-                # if tbl.lower() == "customer_order_lnk":
-                    # self.__define_lnk_order_customer()
-                # if tbl.lower() == "user_tbl":
-                    # self.__define_user_tbl()
-                # if tbl.lower() == "logs_tbl":
-                    # self.__define_logs()
+            order = False
+            menu = False
+            customer = False
+            customer_order = False 
+            user = False
+            logs = False
+
+            for tbl in current_tbls:                       
+                if tbl['Tables_in_ai_takeaway'].lower() == "customer_tbl":
+                    customer = True
+                if tbl['Tables_in_ai_takeaway'].lower() == "menu_item_tbl":
+                    menu = True
+                if tbl['Tables_in_ai_takeaway'].lower() == "order_tbl":
+                    order = True
+                if tbl['Tables_in_ai_takeaway'].lower() == "customer_order_lnk":
+                    customer_order = True
+                if tbl['Tables_in_ai_takeaway'].lower() == "user_tbl":
+                    user = True
+                if tbl['Tables_in_ai_takeaway'].lower() == "logs_tbl":
+                    logs = True
+            
+            if not customer:
+                self.__define_customer_tbl()
+            if not logs:
+                self.__define_logs()
+            if not user:
+                self.__define_user_tbl()
+            if not customer_order:
+                self.__define_lnk_order_customer()
+            if not order:
+                self.__define_order_tbl()
+            if not menu:
+                self.__define_menu_items_tbl()
         else:
             self.__define_customer_tbl()
             self.__define_menu_items_tbl()
             self.__define_order_tbl()
             self.__define_lnk_order_customer()
+            self.__define_user_tbl()
             self.__define_logs()
 
     def __define_customer_tbl(self):
@@ -110,6 +130,13 @@ class MySQLManager:
         self.__execute_query(query)
 
     # endregion
+
+    def drop_all_tbls(self):
+        current_tables = self.__get_tables_made()
+
+        for tbls in current_tables:
+                query = f"DROP TABLE {tbls['Tables_in_ai_takeaway']}"
+                self.__execute_query(query)
 
     def connect(self):
         try:

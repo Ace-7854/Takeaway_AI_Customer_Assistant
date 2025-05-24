@@ -10,6 +10,7 @@ def main():
 
     database.connect()
     database.define_required_tables()
+    # database.drop_all_tbls()
 
     database.disconnect()
     
